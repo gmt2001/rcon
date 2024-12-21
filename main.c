@@ -21,6 +21,8 @@
 #include <netdb.h>
 #include <unistd.h>
 
+static char *version = "1.4";
+
 static char *host = NULL;
 static char *password = NULL;
 static char *port = NULL;
@@ -39,6 +41,7 @@ static void cleanup(void)
 
     src_rcon_free(r);
 
+    free(version);
     free(host);
     free(password);
     free(port);
@@ -50,31 +53,38 @@ static void cleanup(void)
     }
 }
 
+static void version(void)
+{
+    printf("RCON client %s\n", version);
+}
+
 static void usage(void)
 {
+    version();
     puts("");
     puts("Usage:");
     puts(" rcon [options] command");
     puts("");
     puts("Options:");
+    puts(" -h, --help       This help text");
+    puts(" -v, --version    The version line");
     puts(" -c, --config     Alternate configuration file");
     puts(" -d, --debug      Debug output");
-    puts(" -h, --help       This bogus");
     puts(" -H, --host       Host name or IP");
     puts(" -m, --minecraft  Minecraft mode");
     puts(" -n, --nowait     Don't wait for reply from server for commands.");
     puts(" -P, --password   RCON Password");
     puts(" -p, --port       Port or service");
     puts(" -s, --server     Use this server from config file");
-    puts(" -1, --1packet    Unused, backward compability");
 }
 
 static int parse_args(int ac, char **av)
 {
     static struct option opts[] = {
+        { "help", no_argument, 0, 'h' },
+        { "version", no_argument, 0, 'v' },
         { "config", required_argument, 0, 'c' },
         { "debug", no_argument, 0, 'd' },
-        { "help", no_argument, 0, 'h' },
         { "host", required_argument, 0, 'H' },
         { "minecraft", no_argument, 0, 'm' },
         { "nowait", no_argument, 0, 'n' },
@@ -85,7 +95,7 @@ static int parse_args(int ac, char **av)
         { NULL, 0, 0, 0 }
     };
 
-    static char const *optstr = "c:dH:hmnP:p:s:1";
+    static char const *optstr = "c:dH:hvmnP:p:s:1";
 
     int c = 0;
 
@@ -101,6 +111,7 @@ static int parse_args(int ac, char **av)
         case 's': free(server); server = strdup(optarg); break;
         case 'n': nowait = true; break;
         case '1': /* backward compability */ break;
+        case 'v': version(); exit(0); break;
         case 'h': usage(); exit(0); break;
         default: /* intentional */
         case '?': usage(); exit(1); break;

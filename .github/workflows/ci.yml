@@ -18,6 +18,9 @@ jobs:
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Debug
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config Debug
+    - name: Print Version
+      working-directory: ${{github.workspace}}/build
+      run: ./rcon --version
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C Debug
