@@ -4,4 +4,4 @@
 /debian/.debhelper/
 /debian/debhelper-build-stamp
 /debian/rcon/
-
+.vs
