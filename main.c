@@ -21,7 +21,7 @@
 #include <netdb.h>
 #include <unistd.h>
 
-static char *version = "1.4";
+static char *versionStr = "1.4";
 
 static char *host = NULL;
 static char *password = NULL;
@@ -41,7 +41,7 @@ static void cleanup(void)
 
     src_rcon_free(r);
 
-    free(version);
+    free(versionStr);
     free(host);
     free(password);
     free(port);
@@ -55,7 +55,7 @@ static void cleanup(void)
 
 static void version(void)
 {
-    printf("RCON client %s\n", version);
+    printf("RCON client %s\n", versionStr);
 }
 
 static void usage(void)
