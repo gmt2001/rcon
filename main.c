@@ -360,10 +360,12 @@ static int handle_stdin(int sock)
     return ec;
 }
 
-int do_config(void)
+static int do_config(void)
 {
+    bool isDefault = false;
     if (server == NULL) {
-        return 0;
+        isDefault = true;
+        server = "default";
     }
 
     if (config == NULL) {
@@ -371,6 +373,9 @@ int do_config(void)
         size_t sz = 0;
 
         if (home == NULL) {
+            if (isDefault) {
+                return 0;
+            }
             fprintf(stderr, "Neither config file nor $HOME is set\n");
             return 4;
         }
@@ -378,6 +383,9 @@ int do_config(void)
         sz = strlen(home) + 10;
         config = calloc(1, sz);
         if (config == NULL) {
+            if (isDefault) {
+                return 0;
+            }
             return 4;
         }
 
@@ -386,6 +394,9 @@ int do_config(void)
     }
 
     if (config_load(config)) {
+        if (isDefault) {
+            return 0;
+        }
         return 2;
     }
 
@@ -394,6 +405,9 @@ int do_config(void)
     free(password);
 
     if (config_host_data(server, &host, &port, &password, &minecraft)) {
+        if (isDefault) {
+            return 0;
+        }
         fprintf(stderr, "Server %s not found in configuration\n", server);
         return 2;
     }
