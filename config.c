@@ -17,7 +17,7 @@
 
 static GKeyFile *config = NULL;
 
-int config_load(char const *filename)
+int config_load(char const *filename, bool isDefault)
 {
     GError *error = NULL;
 
@@ -29,9 +29,11 @@ int config_load(char const *filename)
     }
 
     if (!g_key_file_load_from_file(config, filename, G_KEY_FILE_NONE, &error)) {
-        fprintf(stderr, "Failed to load configuration file: %s: %s\n",
+        if (!isDefault) {
+            fprintf(stderr, "Failed to load configuration file: %s: %s\n",
                 filename, error->message
             );
+        }
         g_clear_error(&error);
         config_free();
         return -2;

@@ -376,12 +376,15 @@ static int do_config(void)
         server = "default";
     }
 
+    bool configDefault = false;
     if (config == NULL) {
+        configDefault = true;
         char const *home = getenv("HOME");
         size_t sz = 0;
 
         if (home == NULL) {
             if (isDefault) {
+                server = NULL;
                 return 0;
             }
             fprintf(stderr, "Neither config file nor $HOME is set\n");
@@ -392,6 +395,7 @@ static int do_config(void)
         config = calloc(1, sz);
         if (config == NULL) {
             if (isDefault) {
+                server = NULL;
                 return 0;
             }
             return 4;
@@ -401,8 +405,9 @@ static int do_config(void)
         g_strlcat(config, "/.rconrc", sz);
     }
 
-    if (config_load(config)) {
+    if (config_load(config, isDefault && configDefault)) {
         if (isDefault) {
+            server = NULL;
             return 0;
         }
         return 2;
@@ -414,10 +419,15 @@ static int do_config(void)
 
     if (config_host_data(server, &host, &port, &password, &minecraft)) {
         if (isDefault) {
+            server = NULL;
             return 0;
         }
         fprintf(stderr, "Server %s not found in configuration\n", server);
         return 2;
+    }
+
+    if (isDefault) {
+        server = NULL;
     }
 
     return 0;
